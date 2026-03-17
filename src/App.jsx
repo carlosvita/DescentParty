@@ -959,7 +959,7 @@ export default function RPGCharacterSheet() {
             }}>
               Ficha de Personagem
             </h1>
-            <p style={{ margin: "4px 0 0", fontSize: 12, opacity: 0.4, letterSpacing: 2 }}>RPG DE FANTASIA</p>
+            <p style={{ margin: "4px 0 0", fontSize: 12, opacity: 0.4, letterSpacing: 2 }}>DESCENT 2ª ED</p>
           </div>
           <div className="no-print" style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
             <button onClick={handleSave} style={btnStyle} title="Salvar ficha">💾 Salvar</button>
@@ -982,14 +982,13 @@ export default function RPGCharacterSheet() {
                 key={key}
                 onClick={() => { setArchetype(key); }}
                 style={{
-                  padding: "16px 14px", borderRadius: 10, cursor: "pointer",
+                  padding: "10px 12px", borderRadius: 8, cursor: "pointer",
                   background: archetype === key ? `linear-gradient(135deg, ${val.color}22, ${val.color}08)` : t.cardBg,
                   border: archetype === key ? `2px solid ${val.color}88` : `2px solid ${t.cardBorder}`,
                   transition: "all 0.25s ease", textAlign: "center",
                 }}
               >
-                <div style={{ fontSize: 28, marginBottom: 4 }}>{val.icon}</div>
-                <div style={{ fontFamily: "'Cinzel', serif", fontSize: 15, fontWeight: 700, color: archetype === key ? val.color : t.text }}>{key}</div>
+                <div style={{ fontFamily: "'Cinzel', serif", fontSize: 13, fontWeight: 700, color: archetype === key ? val.color : t.text }}>{key}</div>
               </div>
             ))}
           </div>
@@ -1067,7 +1066,7 @@ export default function RPGCharacterSheet() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
               <div>
                 <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: 22, fontWeight: 700, margin: 0, color: archData.color }}>
-                  {heroData.name}
+                  {heroData.name}{className && <span style={{ fontWeight: 400, fontSize: 16, opacity: 0.7 }}>, {className}{hybridSubclass ? ` / ${hybridSubclass}` : ""}</span>}
                 </h2>
                 <p style={{ margin: "4px 0 0", fontSize: 13, fontStyle: "italic", opacity: 0.5, maxWidth: 400, lineHeight: 1.4 }}>
                   "{heroData.fluff}"
@@ -1112,13 +1111,11 @@ export default function RPGCharacterSheet() {
               </div>
               <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: t.textMuted, opacity: heroicFeatUsed ? 0.35 : 1, textDecoration: heroicFeatUsed ? "line-through" : "none", transition: "all 0.2s ease" }}>{heroData.heroicFeat}</p>
             </div>
-          </div>
-        )}
 
-        {/* XP / Gold Tracker */}
-        {className && classSkills && (
+            {/* XP / Gold Tracker */}
+            {className && classSkills && (<>
           <div style={{
-            display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20,
+            display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20, marginTop: 16,
             animation: "fadeIn 0.3s ease",
           }}>
             <div style={{
@@ -1146,11 +1143,9 @@ export default function RPGCharacterSheet() {
               <div style={{ fontSize: 11, opacity: 0.5, marginTop: 4 }}>moedas de ouro</div>
             </div>
           </div>
-        )}
 
-        {/* Equipment */}
-        {className && classSkills && (
-          <div style={{ marginBottom: 24, animation: "fadeIn 0.3s ease" }}>
+          {/* Equipment */}
+          <div style={{ marginBottom: 24 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <label style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.4 }}>
                 Equipamentos ({handsUsed()}/2 mãos · {armorCount()}/1 vestimenta · {otherCount()}/2 outros)
@@ -1281,11 +1276,9 @@ export default function RPGCharacterSheet() {
               </div>
             )}
           </div>
-        )}
 
-        {/* Skills */}
-        {className && classSkills && (
-          <div style={{ marginBottom: 40, animation: "fadeIn 0.3s ease" }}>
+          {/* Skills */}
+          <div style={{ marginBottom: 40 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <label style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.4 }}>
                 Perícias de {className}
@@ -1335,10 +1328,9 @@ export default function RPGCharacterSheet() {
               })}
             </div>
           </div>
-        )}
 
-        {/* Hybrid Subclass Skills */}
-        {isHybridClass && hybridSubclass && hybridSubclassSkills.length > 0 && (
+          {/* Hybrid Subclass Skills */}
+          {isHybridClass && hybridSubclass && hybridSubclassSkills.length > 0 && (
           <div style={{ marginBottom: 40, animation: "fadeIn 0.3s ease" }}>
             <label style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.4, display: "block", marginBottom: 10, color: hybridColor(classSkills.hybridArchetype) }}>
               Perícias de {hybridSubclass} ({classSkills.hybridArchetype} — até 2 XP)
@@ -1363,6 +1355,10 @@ export default function RPGCharacterSheet() {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        </>)}
           </div>
         )}
 
