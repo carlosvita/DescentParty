@@ -738,6 +738,7 @@ export default function RPGCharacterSheet() {
   const [theme, setTheme] = useState("dark");
   const [toast, setToast] = useState("");
   const sheetRef = useRef(null);
+  const heroCardRef = useRef(null);
 
   const t = THEMES[theme];
   const archData = archetype ? ARCHETYPES[archetype] : null;
@@ -903,13 +904,15 @@ export default function RPGCharacterSheet() {
   }
 
   function handleExportPDF() {
-    const el = sheetRef.current;
+    const el = heroCardRef.current;
     if (!el) return;
     const printWin = window.open("", "_blank");
+    const bgColor = theme === "light" ? "#ffffff" : "#0f0e0c";
+    const textColor = theme === "light" ? "#2a2520" : "#e8e0d4";
     printWin.document.write(`<!DOCTYPE html><html><head><title>Ficha de Personagem</title>
       <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
       <style>
-        body { margin: 0; padding: 0; }
+        body { margin: 20px; padding: 0; background: ${bgColor}; color: ${textColor}; font-family: 'EB Garamond', Georgia, serif; }
         @media print { .no-print { display: none !important; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
       </style></head><body>${el.outerHTML}</body></html>`);
     printWin.document.close();
@@ -1058,8 +1061,8 @@ export default function RPGCharacterSheet() {
 
         {/* Hero Card */}
         {heroData && (
-          <div style={{
-            background: `linear-gradient(135deg, ${t.cardBg}, ${t.cardBg})`,
+          <div ref={heroCardRef} style={{
+            background: theme === "light" ? "#ffffff" : `linear-gradient(135deg, ${t.cardBg}, ${t.cardBg})`,
             border: `1px solid ${archData.color}44`,
             borderRadius: 14, padding: 20, marginBottom: 24, animation: "fadeIn 0.3s ease",
           }}>
@@ -1112,45 +1115,14 @@ export default function RPGCharacterSheet() {
               <p style={{ fontSize: 13, lineHeight: 1.6, margin: 0, color: t.textMuted, opacity: heroicFeatUsed ? 0.35 : 1, textDecoration: heroicFeatUsed ? "line-through" : "none", transition: "all 0.2s ease" }}>{heroData.heroicFeat}</p>
             </div>
 
-            {/* XP / Gold Tracker */}
+            {/* Equipment */}
             {className && classSkills && (<>
-          <div style={{
-            display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20, marginTop: 16,
-            animation: "fadeIn 0.3s ease",
-          }}>
-            <div style={{
-              background: "rgba(232,192,106,0.06)", border: "1px solid rgba(232,192,106,0.15)",
-              borderRadius: 10, padding: 14, textAlign: "center",
-            }}>
-              <label style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.5, display: "block", marginBottom: 6 }}>XP Total Disponível</label>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                <button onClick={() => setTotalXP(Math.max(0, totalXP - 1))} style={{ background: t.btnBg, border: "none", color: t.text, width: 28, height: 28, borderRadius: 6, cursor: "pointer", fontSize: 16 }}>−</button>
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: 24, fontWeight: 700, color: "#e8c06a", minWidth: 30, textAlign: "center" }}>{totalXP}</span>
-                <button onClick={() => setTotalXP(totalXP + 1)} style={{ background: t.btnBg, border: "none", color: t.text, width: 28, height: 28, borderRadius: 6, cursor: "pointer", fontSize: 16 }}>+</button>
-              </div>
-              <div style={{ fontSize: 11, opacity: 0.5, marginTop: 4 }}>Usado: {xpUsed} / {totalXP}</div>
-            </div>
-            <div style={{
-              background: "rgba(200,168,126,0.06)", border: "1px solid rgba(200,168,126,0.15)",
-              borderRadius: 10, padding: 14, textAlign: "center",
-            }}>
-              <label style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.5, display: "block", marginBottom: 6 }}>Ouro</label>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                <button onClick={() => setGold(Math.max(0, gold - 25))} style={{ background: t.btnBg, border: "none", color: t.text, width: 28, height: 28, borderRadius: 6, cursor: "pointer", fontSize: 16 }}>−</button>
-                <span style={{ fontFamily: "'Cinzel', serif", fontSize: 24, fontWeight: 700, color: "#c8a87e", minWidth: 40, textAlign: "center" }}>{gold}</span>
-                <button onClick={() => setGold(gold + 25)} style={{ background: t.btnBg, border: "none", color: t.text, width: 28, height: 28, borderRadius: 6, cursor: "pointer", fontSize: 16 }}>+</button>
-              </div>
-              <div style={{ fontSize: 11, opacity: 0.5, marginTop: 4 }}>moedas de ouro</div>
-            </div>
-          </div>
-
-          {/* Equipment */}
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <label style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.4 }}>
                 Equipamentos ({handsUsed()}/2 mãos · {armorCount()}/1 vestimenta · {otherCount()}/2 outros)
               </label>
-              <div style={{ display: "flex", gap: 6 }}>
+              <div className="no-print" style={{ display: "flex", gap: 6 }}>
                 {Object.values(exhaustedItems).some(v => v) && (
                   <button onClick={() => setExhaustedItems({})} style={{
                     background: "rgba(126,200,160,0.12)", border: "1px solid rgba(126,200,160,0.25)",
@@ -1207,7 +1179,7 @@ export default function RPGCharacterSheet() {
                         </div>
                         <p style={{ fontSize: 11, lineHeight: 1.4, margin: "3px 0 0", opacity: isExhausted ? 0.35 : 0.55, textDecoration: isExhausted ? "line-through" : "none", transition: "all 0.2s ease" }}>{item.rules}</p>
                       </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "center", minWidth: 56 }}>
+                      <div className="no-print" style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "center", minWidth: 56 }}>
                         <button onClick={() => toggleEquip(item)} style={{
                           background: isEq ? "rgba(126,200,160,0.15)" : (canEq ? t.btnBg : "transparent"),
                           border: `1px solid ${isEq ? "rgba(126,200,160,0.3)" : (canEq ? t.cardBorder : "transparent")}`,
@@ -1237,7 +1209,7 @@ export default function RPGCharacterSheet() {
 
             {/* Shop */}
             {showShop && (
-              <div style={{ marginTop: 12 }}>
+              <div className="no-print" style={{ marginTop: 12 }}>
                 <label style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.35, display: "block", marginBottom: 8 }}>Loja de Itens</label>
                 <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                   {SHOP_ITEMS.map((item, i) => {
@@ -1359,6 +1331,39 @@ export default function RPGCharacterSheet() {
         )}
 
         </>)}
+          </div>
+        )}
+
+        {/* XP / Gold Tracker */}
+        {className && classSkills && (
+          <div style={{
+            display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20,
+            animation: "fadeIn 0.3s ease",
+          }}>
+            <div style={{
+              background: "rgba(232,192,106,0.06)", border: "1px solid rgba(232,192,106,0.15)",
+              borderRadius: 10, padding: 14, textAlign: "center",
+            }}>
+              <label style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.5, display: "block", marginBottom: 6 }}>XP Total Disponível</label>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                <button onClick={() => setTotalXP(Math.max(0, totalXP - 1))} style={{ background: t.btnBg, border: "none", color: t.text, width: 28, height: 28, borderRadius: 6, cursor: "pointer", fontSize: 16 }}>−</button>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: 24, fontWeight: 700, color: "#e8c06a", minWidth: 30, textAlign: "center" }}>{totalXP}</span>
+                <button onClick={() => setTotalXP(totalXP + 1)} style={{ background: t.btnBg, border: "none", color: t.text, width: 28, height: 28, borderRadius: 6, cursor: "pointer", fontSize: 16 }}>+</button>
+              </div>
+              <div style={{ fontSize: 11, opacity: 0.5, marginTop: 4 }}>Usado: {xpUsed} / {totalXP}</div>
+            </div>
+            <div style={{
+              background: "rgba(200,168,126,0.06)", border: "1px solid rgba(200,168,126,0.15)",
+              borderRadius: 10, padding: 14, textAlign: "center",
+            }}>
+              <label style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.5, display: "block", marginBottom: 6 }}>Ouro</label>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                <button onClick={() => setGold(Math.max(0, gold - 25))} style={{ background: t.btnBg, border: "none", color: t.text, width: 28, height: 28, borderRadius: 6, cursor: "pointer", fontSize: 16 }}>−</button>
+                <span style={{ fontFamily: "'Cinzel', serif", fontSize: 24, fontWeight: 700, color: "#c8a87e", minWidth: 40, textAlign: "center" }}>{gold}</span>
+                <button onClick={() => setGold(gold + 25)} style={{ background: t.btnBg, border: "none", color: t.text, width: 28, height: 28, borderRadius: 6, cursor: "pointer", fontSize: 16 }}>+</button>
+              </div>
+              <div style={{ fontSize: 11, opacity: 0.5, marginTop: 4 }}>moedas de ouro</div>
+            </div>
           </div>
         )}
 
